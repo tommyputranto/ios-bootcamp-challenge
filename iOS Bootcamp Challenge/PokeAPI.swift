@@ -12,7 +12,7 @@ class PokeAPI {
     static let shared = PokeAPI()
     static let baseURL = "https://pokeapi.co/api/v2/"
     
-    // TODO: Implements generics to merge this methods into one
+    // : Implements generics to merge this methods into one
     
     func fetchJSONData<T: Decodable>(url: String, onCompletion: @escaping(T?, Error?) ->  ()){
         let path = url.replacingOccurrences(of: PokeAPI.baseURL, with: "")

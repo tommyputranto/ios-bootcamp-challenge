@@ -7,6 +7,30 @@
 
 import Foundation
 
+// MARK: - Habilities
+struct ResultHabilities: Decodable {
+    var ability: abilityes
+    let is_hidden: Bool
+    let slot: Int
+}
+
+struct abilityes: Decodable {
+    let name: String
+    let url: String
+
+}
+
+// MARK: - TYPES
+struct ResultsTypes: Decodable {
+    let slot: Int
+    let type: type
+}
+
+struct type : Decodable {
+    let name: String
+    let url: String
+}
+
 // MARK: - Pokemon
 
 enum PokemonType: String, Decodable, CaseIterable, Identifiable {
@@ -32,8 +56,8 @@ struct Pokemon: Decodable, Equatable {
     let id: Int
     let name: String
     let image: String?
-    let types: [String]?
-    let abilities: [String]?
+    let types: [ResultsTypes]?
+    let abilities: [ResultHabilities]?
     let weight: Float
     let baseExperience: Int
 
@@ -62,10 +86,10 @@ struct Pokemon: Decodable, Equatable {
         let officialArtWork = try other.nestedContainer(keyedBy: CodingKeys.self, forKey: .officialArtwork)
         self.image = try? officialArtWork.decode(String.self, forKey: .frontDefault)
 
-        // TODO: Decode list of types & abilities
+        // : Decode list of types & abilities
 
-        self.types = []
-        self.abilities = []
+        self.types = try container.decode([ResultsTypes]?.self, forKey: .types)
+        self.abilities = try container.decode([ResultHabilities]?.self, forKey: .abilities)
 
         self.weight = try container.decode(Float.self, forKey: .weight)
         self.baseExperience = try container.decode(Int.self, forKey: .baseExperience)
