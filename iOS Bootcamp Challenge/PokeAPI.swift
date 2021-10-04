@@ -8,14 +8,13 @@
 import Foundation
 
 class PokeAPI {
-
+    
     static let shared = PokeAPI()
     static let baseURL = "https://pokeapi.co/api/v2/"
-
+    
     // TODO: Implements generics to merge this methods into one
-
-    @discardableResult
-    func get(url: String, onCompletion: @escaping(PokemonList?, Error?) -> Void) -> URLSessionDataTask? {
+    
+    func fetchJSONData<T: Decodable>(url: String, onCompletion: @escaping(T?, Error?) ->  ()){
         let path = url.replacingOccurrences(of: PokeAPI.baseURL, with: "")
         let task = URLSession.mock.dataTask(with: PokeAPI.baseURL + path, completionHandler: { data, _, error in
             guard let data = data else {
@@ -23,7 +22,7 @@ class PokeAPI {
                 return
             }
             do {
-                let entity = try JSONDecoder().decode(PokemonList.self, from: data)
+                let entity = try JSONDecoder().decode(T.self, from: data)
                 onCompletion(entity, error)
             } catch {
                 onCompletion(nil, error)
@@ -32,23 +31,15 @@ class PokeAPI {
         task?.resume()
         return task
     }
+    
+    @discardableResult
+    func get(url: String, onCompletion: @escaping(PokemonList?, Error?) -> Void) -> URLSessionDataTask? {
+        fetchJSONData(url: url, onCompletion: onCompletion)
 
+    }
+    
     @discardableResult
     func get(url: String, onCompletion: @escaping(Pokemon?, Error?) -> Void) -> URLSessionDataTask? {
-        let path = url.replacingOccurrences(of: PokeAPI.baseURL, with: "")
-        let task = URLSession.mock.dataTask(with: PokeAPI.baseURL + path, completionHandler: { data, _, error in
-            guard let data = data else {
-                onCompletion(nil, error)
-                return
-            }
-            do {
-                let entity = try JSONDecoder().decode(Pokemon.self, from: data)
-                onCompletion(entity, error)
-            } catch {
-                onCompletion(nil, error)
-            }
-        })
-        task?.resume()
-        return task
+        fetchJSONData(url: url, onCompletion: onCompletion)
     }
 }
